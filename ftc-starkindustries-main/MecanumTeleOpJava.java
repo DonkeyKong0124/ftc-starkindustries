@@ -137,30 +137,45 @@ public class MecanumTeleOpJava extends LinearOpMode {
             towerArm.setPower(1.0);
 
             // Claw toggle
-            if (gamepad1.right_bumper && !lastClawToggle) {
-                clawOpen = !clawOpen;
-                if (clawOpen) {
-                    claw.setPosition(CLAW_OPEN_POSITION);
-                } else {
-                    claw.setPosition(CLAW_CLOSED_POSITION);
-                }
-            }
-            lastClawToggle = gamepad1.right_bumper;
+             if (gamepad1.x){
+                //move to position 0
+                claw.setPosition(0);
+    
+            } else if (gamepad1.right_bumper) {
+                //move to position 0.5
+                claw.setPosition(0.5);
+
+            } else if (gamepad1.y) {
+                //move to position 1
+                claw.setPosition(1);
+                        }
+            telemetry.addData("Servo Position", claw.getPosition());
+            telemetry.addData("Status", "Running");
+            telemetry.update();
+            //if (gamepad1.right_bumper && !lastClawToggle) {
+            //   clawOpen = !clawOpen;
+            //     if (clawOpen) {
+            //         claw.setPosition(CLAW_OPEN_POSITION);
+            //     } else {
+            //         claw.setPosition(CLAW_CLOSED_POSITION);
+            //     }
+            // }
+            // lastClawToggle = gamepad1.right_bumper;
 
             // Intake controls
-            if (gamepad1.right_trigger > 0.1) {
-                intake.setPower(1.0);
-            } else if (gamepad1.left_trigger > 0.1) {
-                intake.setPower(-1.0);
-            } else {
-                intake.setPower(0.0);
-            }
+            // if (gamepad1.right_trigger > 0.1) {
+            //     intake.setPower(1.0);
+            // } else if (gamepad1.left_trigger > 0.1) {
+            //     intake.setPower(-1.0);
+            // } else {
+            //     intake.setPower(0.0);
+            // }
 
             // Telemetry feedback
-            telemetry.addData("Claw Position", clawOpen ? "Open" : "Closed");
-            telemetry.addData("Tower Arm Position", towerArm.getCurrentPosition());
-            telemetry.addData("Target Arm", targetTowerArm);
-            telemetry.update();
+            // telemetry.addData("Claw Position", clawOpen ? "Open" : "Closed");
+            // telemetry.addData("Tower Arm Position", towerArm.getCurrentPosition());
+            // telemetry.addData("Target Arm", targetTowerArm);
+            // telemetry.update();
         }
     }
 }
