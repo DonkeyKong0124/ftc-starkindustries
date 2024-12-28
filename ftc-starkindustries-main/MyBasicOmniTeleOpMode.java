@@ -56,7 +56,7 @@ public class MyBasicOmniTeleOpMode extends LinearOpMode {
         waitForStart();
         runtime.reset();
         
-        claw.setPosition(1.0); //  Start with an Open claw
+        claw.setPosition(0.8); //  Start with an Open claw
 
         // Main loop
         while (opModeIsActive()) {
@@ -86,8 +86,8 @@ public class MyBasicOmniTeleOpMode extends LinearOpMode {
 
 
             // ------------ FORE ARM -------------- //
-            
-            // Fore arm to Extend on Left Trigger.
+
+            //Fore arm to Extend on Left Trigger.
             if(gamepad1.left_trigger>0){
                 foreArm1.setDirection(DcMotorSimple.Direction.FORWARD);
                 foreArm2.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -126,12 +126,12 @@ public class MyBasicOmniTeleOpMode extends LinearOpMode {
             
             // ------------ CLAW -------------- //
 
-            // Claw Open/Close 
+            //Claw Open/Close 
             if (gamepad1.y) { 
-                claw.setPosition(1.0); // Open claw
+                claw.setPosition(0.8); // Open claw
             } 
             if (gamepad1.a) { 
-                claw.setPosition(0.0); // Close claw
+                claw.setPosition(0.3); // Close claw
             }
 
             // Display telemetry data.
