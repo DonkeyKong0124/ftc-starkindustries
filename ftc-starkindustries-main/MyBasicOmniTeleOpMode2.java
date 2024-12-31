@@ -25,9 +25,6 @@ public class MyBasicOmniTeleOpMode2 extends LinearOpMode {
 
     private Servo claw = null;
 
-    private boolean lastBump = false;
-
-
     @Override
     public void runOpMode() {
 
@@ -127,12 +124,22 @@ public class MyBasicOmniTeleOpMode2 extends LinearOpMode {
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Motor Power", "LF (%.2f), RF (%.2f), LB (%.2f), RB (%.2f)",
                     leftFrontWheel.getPower(), rightFrontWheel.getPower(), leftRearWheel.getPower(), rightRearWheel.getPower());
+
             telemetry.addData("Towerarm Power", "%.2f", towerArm.getPower());
             telemetry.addData("Towerarm Direction", "%s", towerArm.getDirection());
+            telemetry.addData("Towerarm Current Position", "%.2f", towerArm.getCurrentPosition());
+            telemetry.addData("Towerarm Target Position", "%.2f", towerArm.getTargetPosition());
+
             telemetry.addData("Fore Arm1 Power", "%.2f", foreArm1.getPower());
-            telemetry.addData("Fore Arm1 Power", "%s", foreArm1.getDirection());
+            telemetry.addData("Fore Arm1 Direction", "%s", foreArm1.getDirection());
+            telemetry.addData("Fore Arm1 Current Position", "%.2f", foreArm1.getCurrentPosition());
+            telemetry.addData("Fore Arm1 Target Position", "%.2f", foreArm1.getTargetPosition());
+
             telemetry.addData("Fore Arm2 Power", "%.2f", foreArm2.getPower());
-            telemetry.addData("Fore Arm2 Power", "%s", foreArm2.getDirection());
+            telemetry.addData("Fore Arm2 Direction", "%s", foreArm2.getDirection());
+            telemetry.addData("Fore Arm2 Current Position", "%.2f", foreArm2.getCurrentPosition());
+            telemetry.addData("Fore Arm2 Target Position", "%.2f", foreArm2.getTargetPosition());
+
             telemetry.addData("Claw Servo Position", "%.2f", claw.getPosition());
             telemetry.addData("Claw Servo Direction", "%s", claw.getDirection());
             telemetry.update();
