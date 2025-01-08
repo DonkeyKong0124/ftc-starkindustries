@@ -53,7 +53,6 @@ public class MyBasicOmniTeleOpMode extends LinearOpMode {
         waitForStart();
         runtime.reset();
 
-        claw.setPosition(0.8); //  Start with an Open claw
 
         // Main loop
         while (opModeIsActive()) {
@@ -100,35 +99,16 @@ public class MyBasicOmniTeleOpMode extends LinearOpMode {
             }
 
 
-            // ------------ PRESETS -------------- //
-
-            // PRESETS for Arms
-            // if (gamepad1.dpad_up) {
-            //     foreArm1.setDirection(DcMotorSimple.Direction.REVERSE);
-            //     foreArm2.setDirection(DcMotorSimple.Direction.REVERSE);
-            //     foreArm1.setPower(1.0);
-            //     foreArm2.setPower(1.0);
-            //     towerArm.setPower(1.0); // <----   This is not working for the UltraPlanetary HD
-            //     // foreArm1.setDirection(DcMotorSimple.Direction.FORWARD);
-            //     // foreArm2.setDirection(DcMotorSimple.Direction.FORWARD);
-            //     // foreArm1.setPower(1.0);
-            //     // foreArm2.setPower(1.0);
-            // } else if (gamepad1.dpad_down) {
-            //     foreArm1.setDirection(DcMotorSimple.Direction.REVERSE);
-            //     foreArm2.setDirection(DcMotorSimple.Direction.REVERSE);
-            //     foreArm1.setPower(1.0);
-            //     foreArm2.setPower(1.0);
-            //     towerArm.setPower(-1.0);// <----   This is not working for the UltraPlanetary HD
-            // }
-
             // ------------ CLAW -------------- //
+
+            claw.scaleRange(0.16, 0.8);
 
             // Claw Open/Close
             if (gamepad1.y) {
-                claw.setPosition(0.8); // Open claw
+                claw.setPosition(1.0); // Open claw
             }
             if (gamepad1.a) {
-                claw.setPosition(0.3); // Close claw
+                claw.setPosition(0.16); // Close claw
             }
 
             // Display telemetry data.
@@ -138,20 +118,22 @@ public class MyBasicOmniTeleOpMode extends LinearOpMode {
 
             telemetry.addData("Towerarm Power", "%.2f", towerArm.getPower());
             telemetry.addData("Towerarm Direction", "%s", towerArm.getDirection());
-            telemetry.addData("Towerarm Current Position", "%.2f", towerArm.getCurrentPosition());
-            telemetry.addData("Towerarm Target Position", "%.2f", towerArm.getTargetPosition());
+            telemetry.addData("Towerarm Current Position", "%d", towerArm.getCurrentPosition());
+            telemetry.addData("Towerarm Target Position", "%d", towerArm.getTargetPosition());
 
             telemetry.addData("Fore Arm1 Power", "%.2f", foreArm1.getPower());
             telemetry.addData("Fore Arm1 Direction", "%s", foreArm1.getDirection());
-            telemetry.addData("Fore Arm1 Current Position", "%.2f", foreArm1.getCurrentPosition());
-            telemetry.addData("Fore Arm1 Target Position", "%.2f", foreArm1.getTargetPosition());
+            telemetry.addData("Fore Arm1 Current Position", "%d", foreArm1.getCurrentPosition());
+            telemetry.addData("Fore Arm1 Target Position", "%d", foreArm1.getTargetPosition());
 
             telemetry.addData("Fore Arm2 Power", "%.2f", foreArm2.getPower());
             telemetry.addData("Fore Arm2 Direction", "%s", foreArm2.getDirection());
-            telemetry.addData("Fore Arm2 Current Position", "%.2f", foreArm2.getCurrentPosition());
-            telemetry.addData("Fore Arm2 Target Position", "%.2f", foreArm2.getTargetPosition());
+            telemetry.addData("Fore Arm2 Current Position", "%d", foreArm2.getCurrentPosition());
+            telemetry.addData("Fore Arm2 Target Position", "%d", foreArm2.getTargetPosition());
 
-            telemetry.addData("Claw Servo Position", "%.2f", claw.getPosition());
+            telemetry.addData("Claw Servo MIN Position", "%.2f", claw.MIN_POSITION);
+            telemetry.addData("Claw Servo MAX Position", "%.2f", claw.MAX_POSITION);
+            telemetry.addData("Claw Servo Current Position", "%.2f", claw.getPosition());
             telemetry.addData("Claw Servo Direction", "%s", claw.getDirection());
             telemetry.update();
         }
