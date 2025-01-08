@@ -24,7 +24,7 @@ import com.qualcomm.robotcore.util.Range;
  *   - Drive Backward for 24 inches
  *   - Stop and close the claw.
  *
- *  The code is written using a method called: encoderDrive(speed, leftInches, rightInches, timeoutS)
+ *  The code is written using a method called: encoderDrive(speed, leftInches, rightInches, timeouts)
  *  that performs the actual movement.
  *  This method assumes that each movement is relative to the last stopping place.
  *  There are other ways to perform encoder based moves, but this method is probably the simplest.
@@ -86,7 +86,6 @@ public class MyStarterBot2025Autonomous extends LinearOpMode {
         foreArm1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         foreArm2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-
         rightFrontWheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightRearWheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftFrontWheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -94,7 +93,6 @@ public class MyStarterBot2025Autonomous extends LinearOpMode {
         towerArm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         foreArm1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         foreArm2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
 
         // Display status and update telemetry.
         telemetry.addData("Status", "Initialized");
@@ -174,6 +172,13 @@ public class MyStarterBot2025Autonomous extends LinearOpMode {
             runtime.reset();
             towerArm.setPower(Math.abs(speed));
 
+            while (opModeIsActive() && runtime.seconds() < timeouts && towerArm.isBusy()) {
+                // Display it for the driver.
+                telemetry.addData("Running to", " %7d", newTarget);
+                telemetry.addData("Currently at", " at %7d", towerArm.getCurrentPosition());
+                telemetry.update();
+            }
+
             // Stop all motion;
             towerArm.setPower(0);
 
@@ -205,6 +210,13 @@ public class MyStarterBot2025Autonomous extends LinearOpMode {
             runtime.reset();
             foreArm1.setPower(Math.abs(speed));
             foreArm2.setPower(Math.abs(speed));
+
+            while (opModeIsActive() && runtime.seconds() < timeouts && (foreArm1.isBusy() || foreArm2.isBusy())) {
+                // Display it for the driver.
+                telemetry.addData("Running to", " %7d", newTarget);
+                telemetry.addData("Currently at", " at %7d :%7d", foreArm1.getCurrentPosition(), foreArm2.getCurrentPosition());
+                telemetry.update();
+            }
 
             // Stop all motion;
             foreArm1.setPower(0);
@@ -248,6 +260,14 @@ public class MyStarterBot2025Autonomous extends LinearOpMode {
             leftRearWheel.setPower(Math.abs(speed));
             rightFrontWheel.setPower(Math.abs(speed));
             rightRearWheel.setPower(Math.abs(speed));
+
+            while (opModeIsActive() && runtime.seconds() < timeouts && (leftFrontWheel.isBusy() || rightFrontWheel.isBusy())) {
+                // Display it for the driver.
+                telemetry.addData("Running to", " %7d :%7d", newLeftTarget, newRightTarget);
+                telemetry.addData("Currently at", " at %7d :%7d",
+                        leftFrontWheel.getCurrentPosition(), rightFrontWheel.getCurrentPosition());
+                telemetry.update();
+            }
 
             // Stop all motion;
             leftFrontWheel.setPower(0);
