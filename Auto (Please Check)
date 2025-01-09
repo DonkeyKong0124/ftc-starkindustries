@@ -110,10 +110,20 @@ public class MyStarterBot2025Autonomous extends LinearOpMode {
         // Step through each leg of the path,
         // Note: Reverse movement is obtained by setting a negative distance (not speed)
 
-        encoderDrive(TURN_SPEED, -10.5, 10.5, 4.0);  // Turn left
 
-        // FROM HEREEEE
-        // encoderDrive(DRIVE_SPEED, 26,  26, 5.0);  // Move forward
+        
+        // encoderDrive(DRIVE_SPEED, 4,  4, 5.0);  // Move forward
+        // encoderDrive(TURN_SPEED,  -14.2, 14.2, 4.0);  // Turn left
+        encoderTowerArm(ARM_SPEED,35,5); // Towerarm lift
+        // encoderDrive(DRIVE_SPEED, 5,  5, 5.0);  // Move forward
+        // encoderForeArms(ARM_SPEED, 5, 5.0); // Extend ForeArm forward
+        // claw.setPosition(0.0);                 //Open Claw
+        // encoderForeArms(ARM_SPEED, -5, 5.0);  // Retract ForeArm back
+        // encoderTowerArm(ARM_SPEED,-35, 5); // Towerarm down
+        // encoderDrive(TURN_SPEED,  15.5, -15.5, 4.0);  // Turn right
+        
+        // encoderDrive(TURN_SPEED, -10.5, 10.5, 4.0);  // Turn left
+        // encoderDrive(DRIVE_SPEED, 28,  28, 5.0);  // Move forward
         // encoderDrive(TURN_SPEED,  10.5, -10.5, 4.0);  // Turn right
         // claw.setPosition(0.0);                 //Open Claw
         // encoderForeArms(ARM_SPEED, 2, 5.0);  // Extend ForeArm forward
