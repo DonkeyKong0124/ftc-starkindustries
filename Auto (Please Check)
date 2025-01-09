@@ -111,17 +111,16 @@ public class MyStarterBot2025Autonomous extends LinearOpMode {
         // Note: Reverse movement is obtained by setting a negative distance (not speed)
 
 
-        
         // encoderDrive(DRIVE_SPEED, 4,  4, 5.0);  // Move forward
         // encoderDrive(TURN_SPEED,  -14.2, 14.2, 4.0);  // Turn left
-        encoderTowerArm(ARM_SPEED,35,5); // Towerarm lift
+        encoderTowerArm(ARM_SPEED, 35, 5); // Towerarm lift
         // encoderDrive(DRIVE_SPEED, 5,  5, 5.0);  // Move forward
         // encoderForeArms(ARM_SPEED, 5, 5.0); // Extend ForeArm forward
         // claw.setPosition(0.0);                 //Open Claw
         // encoderForeArms(ARM_SPEED, -5, 5.0);  // Retract ForeArm back
         // encoderTowerArm(ARM_SPEED,-35, 5); // Towerarm down
         // encoderDrive(TURN_SPEED,  15.5, -15.5, 4.0);  // Turn right
-        
+
         // encoderDrive(TURN_SPEED, -10.5, 10.5, 4.0);  // Turn left
         // encoderDrive(DRIVE_SPEED, 28,  28, 5.0);  // Move forward
         // encoderDrive(TURN_SPEED,  10.5, -10.5, 4.0);  // Turn right
@@ -182,7 +181,7 @@ public class MyStarterBot2025Autonomous extends LinearOpMode {
             runtime.reset();
             towerArm.setPower(Math.abs(speed));
 
-            while (opModeIsActive() && runtime.seconds() < timeouts && towerArm.isBusy()) {
+            while (opModeIsActive() && (runtime.seconds() < timeouts) && towerArm.isBusy()) {
                 // Display it for the driver.
                 telemetry.addData("Running to", " %7d", newTarget);
                 telemetry.addData("Currently at", " at %7d", towerArm.getCurrentPosition());
@@ -221,7 +220,7 @@ public class MyStarterBot2025Autonomous extends LinearOpMode {
             foreArm1.setPower(Math.abs(speed));
             foreArm2.setPower(Math.abs(speed));
 
-            while (opModeIsActive() && runtime.seconds() < timeouts && (foreArm1.isBusy() || foreArm2.isBusy())) {
+            while (opModeIsActive() && (runtime.seconds() < timeouts) && (foreArm1.isBusy() || foreArm2.isBusy())) {
                 // Display it for the driver.
                 telemetry.addData("Running to", " %7d", newTarget);
                 telemetry.addData("Currently at", " at %7d :%7d", foreArm1.getCurrentPosition(), foreArm2.getCurrentPosition());
@@ -271,7 +270,7 @@ public class MyStarterBot2025Autonomous extends LinearOpMode {
             rightFrontWheel.setPower(Math.abs(speed));
             rightRearWheel.setPower(Math.abs(speed));
 
-            while (opModeIsActive() && runtime.seconds() < timeouts && (leftFrontWheel.isBusy() || rightFrontWheel.isBusy())) {
+            while (opModeIsActive() && (runtime.seconds() < timeouts) && (leftFrontWheel.isBusy() || rightFrontWheel.isBusy())) {
                 // Display it for the driver.
                 telemetry.addData("Running to", " %7d :%7d", newLeftTarget, newRightTarget);
                 telemetry.addData("Currently at", " at %7d :%7d",
