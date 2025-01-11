@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
 
-@TeleOp(name = "uncle code", group = "Linear OpMode")
+@TeleOp(name = "Tele", group = "Linear OpMode")
 public class MyBasicOmniTeleOpMode extends LinearOpMode {
 
     // Declare OpMode members for motors and servos.
@@ -62,7 +62,7 @@ public class MyBasicOmniTeleOpMode extends LinearOpMode {
             // AXIAL - Forward and Backward
             double axialPower = -gamepad1.left_stick_y;
             // LATERAL - Left and Right
-            double lateralPower = gamepad1.left_stick_x;
+            double lateralPower = gamepad1.left_stick_x/2;
             // YAW - Clockwise and Anti-clockwise
             double yawPower = gamepad1.right_stick_x;
 
@@ -89,26 +89,32 @@ public class MyBasicOmniTeleOpMode extends LinearOpMode {
                 foreArm2.setDirection(DcMotorSimple.Direction.FORWARD);
                 foreArm1.setPower(gamepad1.left_trigger);
                 foreArm2.setPower(gamepad1.left_trigger);
+            } else {
+                foreArm1.setPower(0);
+                foreArm2.setPower(0);
             }
             // Fore arm to Retract on Right Trigger.
             if (gamepad1.right_trigger > 0) {
                 foreArm1.setDirection(DcMotorSimple.Direction.REVERSE);
                 foreArm2.setDirection(DcMotorSimple.Direction.REVERSE);
-                foreArm1.setPower(gamepad1.right_trigger);
-                foreArm2.setPower(gamepad1.right_trigger);
+                foreArm1.setPower(gamepad1.right_trigger/2);
+                foreArm2.setPower(gamepad1.right_trigger/2);
+            } else {
+                foreArm1.setPower(0);
+                foreArm2.setPower(0);
             }
 
 
             // ------------ CLAW -------------- //
 
-            claw.scaleRange(0.16, 0.8);
+            claw.scaleRange(0.1, 0.8);
 
             // Claw Open/Close
             if (gamepad1.y) {
-                claw.setPosition(1.0); // Open claw
+                claw.setPosition(0.1); // Open claw
             }
             if (gamepad1.a) {
-                claw.setPosition(0.16); // Close claw
+                claw.setPosition(1.0); // Close claw
             }
 
             // Display telemetry data.
