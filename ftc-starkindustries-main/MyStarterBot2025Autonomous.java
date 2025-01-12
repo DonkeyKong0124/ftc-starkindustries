@@ -43,9 +43,9 @@ public class MyStarterBot2025Autonomous extends LinearOpMode {
     static final double WHEEL_DIAMETER_INCHES = 2.95;     // For figuring circumference
     static final double COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
             (WHEEL_DIAMETER_INCHES * 3.1415);
-    static final double DRIVE_SPEED = 0.7;
-    static final double TURN_SPEED = 0.6;
-    static final double ARM_SPEED = 0.5;
+    static final double DRIVE_SPEED = 1;
+    static final double TURN_SPEED = 1;
+    static final double ARM_SPEED = 1.1;
     // Declare OpMode members for motors and servos.
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor rightFrontWheel = null; // Forward
@@ -110,7 +110,68 @@ public class MyStarterBot2025Autonomous extends LinearOpMode {
         // Step through each leg of the path,
         // Note: Reverse movement is obtained by setting a negative distance (not speed)
         
+
+        // FIRST HOOK (COMPLETED)
+        encoderDrive(DRIVE_SPEED, 6.3, 6.3, 1.0);  // Move forward
+        encoderDrive(TURN_SPEED, -10.5, 10.5, 1.0);  // Turn left
+        encoderDrive(DRIVE_SPEED, 10,  10, 1.0);  // Move forward
+        encoderDrive(TURN_SPEED, 10.6, -10.6, 1.0);  // Turn right
+        encoderTowerArm(ARM_SPEED, 30, 3.5); // Towerarm lift
+        encoderForeArms(ARM_SPEED, 44, 2); // Extend ForeArm forward
+        claw.setPosition(0.0);                 //Open Claw
+       
+       // SECOND HOOK (IN PROGRESS)
+        encoderForeArms(ARM_SPEED, -7, 1.0); // retract ForeArm backward
+        encoderTowerArm(ARM_SPEED, -20, 1.0); // Towerarm down
+        encoderDrive(TURN_SPEED, 10.5, -10.5, 1.0);  // Turn right
+        encoderDrive(DRIVE_SPEED, 22,  22, 3.0);  // Move forward
+        encoderDrive(TURN_SPEED, -10.5, 10.5, 1.0);  // Turn left        
+        encoderDrive(DRIVE_SPEED, 4.9,  4.9, 2.4);  // Move forward
+        claw.setPosition(1.0);  //Close Claw
+        sleep(1000);
+        encoderDrive(TURN_SPEED, 20, -20, 4.0);  // Turn right
+        encoderDrive(DRIVE_SPEED, 10, 14, 4.0);  // Move forward
+        sleep(1000);
+        claw.setPosition(0.0);                 //Open Claw
+        
+
+
+
+
+
+
+
+
+
+
+        // encoderDrive(TURN_SPEED, 10.5, -10.5, 2.3);  // Turn right
+        // encoderDrive(DRIVE_SPEED, 5,  5, 1.0);  // Move forward
+        // encoderDrive(TURN_SPEED, 10.5, -10.5, 2.3);  // Turn right
+        //  encoderDrive(DRIVE_SPEED, 10,  10, 1.0);  // Move forward
+        //   encoderTowerArm(ARM_SPEED, 10, 3.5); // Towerarm lift
+        // encoderForeArms(ARM_SPEED, 10, 3.5); // Extend ForeArm forward
+        // claw.setPosition(1.0);                 //Close Claw
+        
+        // encoderDrive(DRIVE_SPEED, 3, 3, 2.0);  // Move forward
+        // encoderDrive(TURN_SPEED, -10.5, 10.5, 2.0);  // Turn left
+        // encoderDrive(DRIVE_SPEED, 10,  10, 1.0);  // Move forward
+        // encoderDrive(TURN_SPEED, 10.5, -10.5, 2.3);  // Turn right
+        // encoderDrive(DRIVE_SPEED, 4,  4, 1.0);  // Move forward
+        // encoderTowerArm(ARM_SPEED, 20, 3.5); // Towerarm lift
+        // encoderForeArms(ARM_SPEED, 40, 3.5); // Extend ForeArm forward
+        //   encoderDrive(DRIVE_SPEED, 3,  3, 1.0);  // Move forward
+        // claw.setPosition(0.0);                 //Open Claw
+        // encoderForeArms(ARM_SPEED, -40, 3.5); // retract ForeArm backward
+        // encoderTowerArm(ARM_SPEED, -23, 3.5); // Towerarm down
+        //   encoderDrive(DRIVE_SPEED, -2, -2, 1.0);  // Move back
+         
+      
+         
+         
+         
          //STRAFING --->
+       // encoderYaw(DRIVE_SPEED, -7, 7, 5.0); // Strafe left
+        //encoderDrive(DRIVE_SPEED, 5, 5, 5.0);  // Move forward
         //  encoderYaw(DRIVE_SPEED, -7, 7, 3.0);  // Strafe left
         //   claw.setPosition(0.0);                 //Open Claw
         //  encoderForeArms(ARM_SPEED, 1, 2.0); // Extend ForeArm forward
@@ -118,46 +179,46 @@ public class MyStarterBot2025Autonomous extends LinearOpMode {
         
         
         //WITHOUT STRAFING
-         encoderDrive(DRIVE_SPEED, 1,  1, 1.0);  // Move forward
-         encoderDrive(TURN_SPEED, -10.5, 10.5, 2.0);  // Turn left
-         encoderDrive(DRIVE_SPEED, 7.5,  7.5, 1.0);  // Move forward
-         encoderDrive(TURN_SPEED, 10.5, -10.5, 2.3);  // Turn right
-         encoderForeArms(ARM_SPEED, 1, 2.0); // Extend ForeArm forward
-         encoderDrive(DRIVE_SPEED, 4,  4, 2.0);  // Move forward
-         claw.setPosition(1.0);                 //Close Claw
-         encoderForeArms(ARM_SPEED, -5, 3.5); // retract ForeArm back
-         encoderTowerArm(ARM_SPEED, 35, 3.5); // Towerarm lift
-         encoderDrive(DRIVE_SPEED, -5,  -5, 1.0);  // Move backward
-         encoderDrive(TURN_SPEED,  -13.5, 13.5, 2.0);  // Turn left
-         encoderDrive(DRIVE_SPEED, 2,  2, 1.0);  // Move forward
-         encoderForeArms(ARM_SPEED, 35, 3.5); // Extend ForeArm forward
-         claw.setPosition(0.0);                 //Open Claw
-         encoderForeArms(ARM_SPEED, -35, 3.5); // retract ForeArm back
-         encoderTowerArm(ARM_SPEED, -35, 3.5); // Towerarm down
-         encoderDrive(TURN_SPEED, 13.3, -13.3, 2.0);  // Turn right
-         encoderForeArms(ARM_SPEED, 1, 1.0); // Extend ForeArm forward
-         encoderDrive(DRIVE_SPEED, 5,  5, 1.0);  // Move forward
-         claw.setPosition(1.0);                 //Close Claw
-         encoderForeArms(ARM_SPEED, -5, 3.5); // retract ForeArm back
-         encoderTowerArm(ARM_SPEED, 35, 3.5); // Towerarm lift
-         encoderDrive(DRIVE_SPEED, -5,  -5, 1.0);  // Move backward
-         encoderDrive(TURN_SPEED, -13.3, 13.3, 2.0);  // Turn left
-         encoderForeArms(ARM_SPEED, 35, 3.5); // Extend ForeArm forward
-         claw.setPosition(0.0);                 //Open Claw
-         encoderForeArms(ARM_SPEED, -35, 3.5); // retract ForeArm back
-         encoderTowerArm(ARM_SPEED, -35, 3.5); // Towerarm down
-         encoderDrive(TURN_SPEED, 11.4, -11.4, 2.0);  // Turn right
-         encoderForeArms(ARM_SPEED, 1, 1.0); // Extend ForeArm forward
-         encoderDrive(DRIVE_SPEED, 6,  6, 1.0);  // Move forward
-         claw.setPosition(1.0);                 //Close Claw
-         encoderForeArms(ARM_SPEED, -5, 2.0); // retract ForeArm back
-         encoderTowerArm(ARM_SPEED, 35, 3.5); // Towerarm lift
-         encoderDrive(DRIVE_SPEED, -4,  -4, 1.0);  // Move backward
-         encoderDrive(TURN_SPEED, -11.4, 11.4, 2.0);  // Turn left
-         encoderForeArms(ARM_SPEED, 35, 3.5); // Extend ForeArm forward
-         claw.setPosition(0.0);                 //Open Claw
-         encoderForeArms(ARM_SPEED, -35, 3.5); // retract ForeArm back
-         encoderTowerArm(ARM_SPEED, -35, 3.5); // Towerarm down
+        //  encoderDrive(DRIVE_SPEED, 1,  1, 1.0);  // Move forward
+        //  encoderDrive(TURN_SPEED, -10.5, 10.5, 2.0);  // Turn left
+        //  encoderDrive(DRIVE_SPEED, 7.5,  7.5, 1.0);  // Move forward
+        //  encoderDrive(TURN_SPEED, 10.5, -10.5, 2.3);  // Turn right
+        //  encoderForeArms(ARM_SPEED, 1, 2.0); // Extend ForeArm forward
+        //  encoderDrive(DRIVE_SPEED, 4,  4, 2.0);  // Move forward
+        //  claw.setPosition(1.0);                 //Close Claw
+        //  encoderForeArms(ARM_SPEED, -5, 3.5); // retract ForeArm back
+        //  encoderTowerArm(ARM_SPEED, 35, 3.5); // Towerarm lift
+        //  encoderDrive(DRIVE_SPEED, -5,  -5, 1.0);  // Move backward
+        //  encoderDrive(TURN_SPEED,  -13.5, 13.5, 2.0);  // Turn left
+        //  encoderDrive(DRIVE_SPEED, 2,  2, 1.0);  // Move forward
+        //  encoderForeArms(ARM_SPEED, 35, 3.5); // Extend ForeArm forward
+        //  claw.setPosition(0.0);                 //Open Claw
+        //  encoderForeArms(ARM_SPEED, -35, 3.5); // retract ForeArm back
+        //  encoderTowerArm(ARM_SPEED, -35, 3.5); // Towerarm down
+        //  encoderDrive(TURN_SPEED, 13.3, -13.3, 2.0);  // Turn right
+        //  encoderForeArms(ARM_SPEED, 1, 1.0); // Extend ForeArm forward
+        //  encoderDrive(DRIVE_SPEED, 5,  5, 1.0);  // Move forward
+        //  claw.setPosition(1.0);                 //Close Claw
+        //  encoderForeArms(ARM_SPEED, -5, 3.5); // retract ForeArm back
+        //  encoderTowerArm(ARM_SPEED, 35, 3.5); // Towerarm lift
+        //  encoderDrive(DRIVE_SPEED, -5,  -5, 1.0);  // Move backward
+        //  encoderDrive(TURN_SPEED, -13.3, 13.3, 2.0);  // Turn left
+        //  encoderForeArms(ARM_SPEED, 35, 3.5); // Extend ForeArm forward
+        //  claw.setPosition(0.0);                 //Open Claw
+        //  encoderForeArms(ARM_SPEED, -35, 3.5); // retract ForeArm back
+        //  encoderTowerArm(ARM_SPEED, -35, 3.5); // Towerarm down
+        //  encoderDrive(TURN_SPEED, 11.4, -11.4, 2.0);  // Turn right
+        //  encoderForeArms(ARM_SPEED, 1, 1.0); // Extend ForeArm forward
+        //  encoderDrive(DRIVE_SPEED, 6,  6, 1.0);  // Move forward
+        //  claw.setPosition(1.0);                 //Close Claw
+        //  encoderForeArms(ARM_SPEED, -5, 2.0); // retract ForeArm back
+        //  encoderTowerArm(ARM_SPEED, 35, 3.5); // Towerarm lift
+        //  encoderDrive(DRIVE_SPEED, -4,  -4, 1.0);  // Move backward
+        //  encoderDrive(TURN_SPEED, -11.4, 11.4, 2.0);  // Turn left
+        //  encoderForeArms(ARM_SPEED, 35, 3.5); // Extend ForeArm forward
+        //  claw.setPosition(0.0);                 //Open Claw
+        //  encoderForeArms(ARM_SPEED, -35, 3.5); // retract ForeArm back
+        //  encoderTowerArm(ARM_SPEED, -35, 3.5); // Towerarm down
         
 
 
@@ -299,57 +360,5 @@ public class MyStarterBot2025Autonomous extends LinearOpMode {
         }
     }
     
-    public void encoderYaw(double speed,
-                             double leftInches, double rightInches,
-                             double timeouts) {
-        int newLeftTarget;
-        int newRightTarget;
-
-        // Ensure that the OpMode is still active
-        if (opModeIsActive()) {
-
-            // Determine new target position, and pass to motor controller
-            newLeftTarget = leftFrontWheel.getCurrentPosition() + (int) (leftInches * COUNTS_PER_INCH);
-            newRightTarget = rightFrontWheel.getCurrentPosition() + (int) (rightInches * COUNTS_PER_INCH);
-
-            leftFrontWheel.setTargetPosition(newLeftTarget);
-            leftRearWheel.setTargetPosition(newLeftTarget);
-            rightFrontWheel.setTargetPosition(newRightTarget);
-            rightRearWheel.setTargetPosition(newRightTarget);
-
-            // Turn On RUN_TO_POSITION
-            leftFrontWheel.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            leftRearWheel.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            rightFrontWheel.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            rightRearWheel.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-            // reset the timeout time and start motion.
-            runtime.reset();
-            leftFrontWheel.setPower(Math.abs(speed));
-            leftRearWheel.setPower(Math.abs(speed));
-            rightFrontWheel.setPower(Math.abs(speed));
-            rightRearWheel.setPower(Math.abs(speed));
-
-            while (opModeIsActive() && (runtime.seconds() < timeouts) && (leftFrontWheel.isBusy() || rightFrontWheel.isBusy())) {
-                // Display it for the driver.
-                telemetry.addData("Running to", " %7d :%7d", newLeftTarget, newRightTarget);
-                telemetry.addData("Currently at", " at %7d :%7d",
-                        leftFrontWheel.getCurrentPosition(), rightFrontWheel.getCurrentPosition());
-                telemetry.update();
-            }
-
-            // Stop all motion;
-            leftFrontWheel.setPower(0);
-            leftRearWheel.setPower(0);
-            rightFrontWheel.setPower(0);
-            rightRearWheel.setPower(0);
-
-            // Turn off RUN_TO_POSITION
-            leftFrontWheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            leftRearWheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            rightFrontWheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            rightRearWheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        }
-    }
+    
 }
