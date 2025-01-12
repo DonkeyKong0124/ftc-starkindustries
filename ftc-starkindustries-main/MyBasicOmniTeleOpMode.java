@@ -97,8 +97,8 @@ public class MyBasicOmniTeleOpMode extends LinearOpMode {
             if (gamepad1.right_trigger > 0) {
                 foreArm1.setDirection(DcMotorSimple.Direction.REVERSE);
                 foreArm2.setDirection(DcMotorSimple.Direction.REVERSE);
-                foreArm1.setPower(gamepad1.right_trigger/2);
-                foreArm2.setPower(gamepad1.right_trigger/2);
+                foreArm1.setPower(gamepad1.right_trigger);
+                foreArm2.setPower(gamepad1.right_trigger);
             } else {
                 foreArm1.setPower(0);
                 foreArm2.setPower(0);
