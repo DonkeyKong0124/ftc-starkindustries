@@ -19,11 +19,17 @@ public class MyBasicOmniTeleOpMode extends LinearOpMode {
     private DcMotor leftFrontWheel = null; // Backward
     private DcMotor leftRearWheel = null; // Backward
 
-    private DcMotor linearSlides = null; // Declare REV Core Hex Motor here
-    private DcMotor linearSlide = null; // Declare REV Core Hex Motor here
+    private DcMotor LeftlinearSlides = null; // Declare REV Core Hex Motor here
+    private DcMotor RightlinearSlides = null; // Declare REV Core Hex Motor here
+    private DcMotor horizontalSlide = null; // Declare REV Core Hex Motor here
 
-    private Servo linearClaw = null;
-    private Servo claw = null;
+    private Servo verticalClaw = null;
+    private Servo horizontalClaw = null;
+
+    private double VERTICAL_HOOK_POSITION = 800;
+    private double VERTICAL_PERIMETER_POSITION = 300;
+
+    private double horizontalSlidePosition = gamepad1.right_stick_y;
 
     @Override
     public void runOpMode() {
@@ -34,11 +40,12 @@ public class MyBasicOmniTeleOpMode extends LinearOpMode {
         leftFrontWheel = hardwareMap.get(DcMotor.class, "frontLeft"); // Backward
         leftRearWheel = hardwareMap.get(DcMotor.class, "backLeft"); // Backward
 
-        linearSlideRight = hardwareMap.get(DcMotor.class, "linearSlideRight"); // Initialize the Core Hex Motor
-        linearSlideLeft = hardwareMap.get(DcMotor.class, "linearSlideLeft"); // Initialize the Core Hex Motor
+        linearSlideRight = hardwareMap.get(DcMotor.class, "linearSlideRight"); // Initialize the Core Hex Motor for the right linear slide
+        linearSlideLeft = hardwareMap.get(DcMotor.class, "linearSlideLeft"); // Initialize the Core Hex Motor for the left linear slide
+        horizontalSlide = hardwareMap.get(DcMotor.class, "horizontalSlide"); // Initialize the Core Hex Motor for the horizontal slide
 
-        linearClaw = hardwareMap.get(Servo.class, "linearClaw");
-        claw = hardwareMap.get(Servo.class, "claw");
+        verticalClaw = hardwareMap.get(Servo.class, "verticalClaw");
+        horizontalClaw = hardwareMap.get(Servo.class, "horizontalClaw");
 
         // Set motor directions.
         rightFrontWheel.setDirection(DcMotor.Direction.FORWARD);
@@ -76,41 +83,81 @@ public class MyBasicOmniTeleOpMode extends LinearOpMode {
 
             // ------------ LINEAR SLIDES -------------- //
 
-            
+        // This preset is for raising the slides above the high chamber  
         if (gamepad1.dpad_up) 
-            {
-                slideMotor.setTargetPosition(1000); // Move to position 1000
-                slideMotor.setPower(1.0); // Apply power
-            }
+        {
+            if (verticalSlideLeft.getTargetPosition() != VERTICAL_HOOK_POSITION)
+                {
+                    verticalSlideLeft.setTargetPosition(VERTICAL_HOOK_POSITION); // Move to position 
+                    verticalSlideRight.setTargetPosition(VERTICAL_HOOK_POSITION); // Move to position
+                }
+            verticalSlideRight.setTargetPosition(650); //Move down and hook specimen
+        }
+        // Preset to grab specimen from the observation zone perimeter
         else if (gamepad1.dpad_down)
+        {
+            // Checks if the claw is closed then opens if true
+            if (horizontalClaw.getPosition() == 0.0)
             {
-                slideMotor.setTargetPosition(0); // Move to position 0
-                slideMotor.setPower(1.0); // Apply power
+                horizontalClaw.setPosition(1.0); //opens claw
             }
+            // Move the vertical slide to perimeter position
+            verticalSlideLeft.setTargetPosition(VERTICAL_PERIMETER_POSITION); // Move to position
+            verticalSlideRight.setTargetPosition(VERTICAL_PERIMETER_POSITION); // Move to position
+            // Close the claw
+            horizontalClaw.setPower(0.0);
+            // Lift the vertical slide to high chamber hook position
+            verticalSlideLeft.setTargetPosition(VERTICAL_HOOK_POSITION); // Move to position 1000
+            verticalSlideRight.setTargetPosition(VERTICAL_HOOK_POSITION); // Move to position 1000
+            
+        }
 
 
-            // ------------ LINEAR CLAW -------------- //
+            // ------------ CLAW -------------- //
 
-            claw.scaleRange(0.1, 0.8);
-            linearClaw.scaleRange(0.1, 0.8);
+            horizontalClaw.scaleRange(0.1, 0.8);
+            verticalClaw.scaleRange(0.1, 0.8);
 
-            // Linear Claw Open/Close
+            // Vertical Claw Open/Close
             if (gamepad1.b) {
-                linearClaw.setPosition(0.1); // Open claw
+                verticalClaw.setPosition(0.1); // Open claw
             }
             if (gamepad1.x) {
-                linearClaw.setPosition(1.0); // Close claw
+                verticalClaw.setPosition(1.0); // Close claw
             }
 
-            // Claw Open/Close
+            // Horizontal Claw Open/Close
             if (gamepad1.y) {
-                claw.setPosition(0.1); // Open claw
+                horizontalClaw.setPosition(0.0); // Open claw
             }
             if (gamepad1.a) {
-                claw.setPosition(1.0); // Close claw
+                horizontalClaw.setPosition(1.0); // Close claw
             }
 
 
+            // ---------------- Horizontal slide -------------------
+
+            
+            //horizontalSlide.setPosition(gamepad1.right_stick_y);
+
+            //if the right stick goes up set the motor direction forward
+            if (gamepad1.right_stick_y.getPosition() > 0.0)
+            {
+                horizontalSlide.setDirection(DcMotor.Direction.FORWARD); // sets the motor to go forward
+            }
+            //if the right stick does down set the motor reverse
+            else if (gamepad1.right_stick_y.getPosition() < 0.0)
+            {
+                horizontalSlide.setDirection(DcMotor.Direction.REVERSE); // sets the motor reverse
+            }
+            else
+            {
+                // sets the position of the slide back to zero
+                horizontalSlide.setPosition(0.0);
+            }
+
+
+// TODO: UPDATE TELEMETRY CONSOLE OUTPUT VALUES
 
             // Display telemetry data.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
