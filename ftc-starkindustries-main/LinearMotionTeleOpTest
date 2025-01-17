@@ -1,1 +1,133 @@
+// CODE FOR THE CONTROLLER PORTION
 
+package org.firstinspires.ftc.teamcode;
+
+import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.Servo;
+
+@TeleOp(name = "Tele", group = "Linear OpMode")
+public class MyBasicOmniTeleOpMode extends LinearOpMode {
+
+    // Declare OpMode members for motors and servos.
+    private ElapsedTime runtime = new ElapsedTime();
+    private DcMotor rightFrontWheel = null; // Forward
+    private DcMotor rightRearWheel = null; // Forward
+    private DcMotor leftFrontWheel = null; // Backward
+    private DcMotor leftRearWheel = null; // Backward
+
+    private DcMotor linearSlides = null; // Declare REV Core Hex Motor here
+    private DcMotor linearSlide = null; // Declare REV Core Hex Motor here
+
+    private Servo linearClaw = null;
+    private Servo claw = null;
+
+    @Override
+    public void runOpMode() {
+
+        // Initialize hardware variables with names matching the robot configuration.
+        rightFrontWheel = hardwareMap.get(DcMotor.class, "frontRight"); // Forward
+        rightRearWheel = hardwareMap.get(DcMotor.class, "backRight"); // Forward
+        leftFrontWheel = hardwareMap.get(DcMotor.class, "frontLeft"); // Backward
+        leftRearWheel = hardwareMap.get(DcMotor.class, "backLeft"); // Backward
+
+        linearSlideRight = hardwareMap.get(DcMotor.class, "linearSlideRight"); // Initialize the Core Hex Motor
+        linearSlideLeft = hardwareMap.get(DcMotor.class, "linearSlideLeft"); // Initialize the Core Hex Motor
+
+        linearClaw = hardwareMap.get(Servo.class, "linearClaw");
+        claw = hardwareMap.get(Servo.class, "claw");
+
+        // Set motor directions.
+        rightFrontWheel.setDirection(DcMotor.Direction.FORWARD);
+        rightRearWheel.setDirection(DcMotor.Direction.FORWARD);
+        leftFrontWheel.setDirection(DcMotor.Direction.REVERSE);
+        leftRearWheel.setDirection(DcMotor.Direction.REVERSE);
+
+        // Display status and update telemetry.
+        telemetry.addData("Status", "Initialized");
+        telemetry.update();
+
+        waitForStart();
+        runtime.reset();
+
+
+        // Main loop
+        while (opModeIsActive()) {
+
+            // ------------ WHEELS -------------- //
+
+            // AXIAL - Forward and Backward
+            double axialPower = -gamepad1.left_stick_y;
+            // LATERAL - Left and Right
+            double lateralPower = gamepad1.left_stick_x/2;
+            // YAW - Clockwise and Anti-clockwise
+            double yawPower = gamepad1.right_stick_x;
+
+            // Set motor power for drivetrain.
+            rightFrontWheel.setPower(axialPower - lateralPower - yawPower);
+            rightRearWheel.setPower(-axialPower + lateralPower - yawPower);
+
+            leftFrontWheel.setPower(axialPower + lateralPower + yawPower);
+            leftRearWheel.setPower(-axialPower - lateralPower + yawPower);
+
+
+            // ------------ LINEAR SLIDES -------------- //
+
+            
+          
+
+
+            // ------------ LINEAR CLAW -------------- //
+
+            claw.scaleRange(0.1, 0.8);
+            linearClaw.scaleRange(0.1, 0.8);
+
+            // Linear Claw Open/Close
+            if (gamepad1.b) {
+                linearClaw.setPosition(0.1); // Open claw
+            }
+            if (gamepad1.x) {
+                linearClaw.setPosition(1.0); // Close claw
+            }
+
+            // Claw Open/Close
+            if (gamepad1.y) {
+                claw.setPosition(0.1); // Open claw
+            }
+            if (gamepad1.a) {
+                claw.setPosition(1.0); // Close claw
+            }
+
+
+
+            // Display telemetry data.
+            telemetry.addData("Status", "Run Time: " + runtime.toString());
+            telemetry.addData("Motor Power", "LF (%.2f), RF (%.2f), LB (%.2f), RB (%.2f)",
+                    leftFrontWheel.getPower(), rightFrontWheel.getPower(), leftRearWheel.getPower(), rightRearWheel.getPower());
+
+            telemetry.addData("", "%.2f", towerArm.getPower());
+            telemetry.addData("Towerarm Direction", "%s", towerArm.getDirection());
+            telemetry.addData("Towerarm Current Position", "%d", towerArm.getCurrentPosition());
+            telemetry.addData("Towerarm Target Position", "%d", towerArm.getTargetPosition());
+
+            telemetry.addData("Fore Arm1 Power", "%.2f", foreArm1.getPower());
+            telemetry.addData("Fore Arm1 Direction", "%s", foreArm1.getDirection());
+            telemetry.addData("Fore Arm1 Current Position", "%d", foreArm1.getCurrentPosition());
+            telemetry.addData("Fore Arm1 Target Position", "%d", foreArm1.getTargetPosition());
+
+            telemetry.addData("Fore Arm2 Power", "%.2f", foreArm2.getPower());
+            telemetry.addData("Fore Arm2 Direction", "%s", foreArm2.getDirection());
+            telemetry.addData("Fore Arm2 Current Position", "%d", foreArm2.getCurrentPosition());
+            telemetry.addData("Fore Arm2 Target Position", "%d", foreArm2.getTargetPosition());
+
+            telemetry.addData("Claw Servo MIN Position", "%.2f", claw.MIN_POSITION);
+            telemetry.addData("Claw Servo MAX Position", "%.2f", claw.MAX_POSITION);
+            telemetry.addData("Claw Servo Current Position", "%.2f", claw.getPosition());
+            telemetry.addData("Claw Servo Direction", "%s", claw.getDirection());
+            telemetry.update();
+        }
+    }
+}
