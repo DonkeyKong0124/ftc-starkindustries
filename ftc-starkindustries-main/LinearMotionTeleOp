@@ -28,6 +28,8 @@ public class MyBasicOmniTeleOpMode extends LinearOpMode {
 
     private double VERTICAL_HOOK_POSITION = 800;
     private double VERTICAL_PERIMETER_POSITION = 300;
+    
+    public static final DcMotor.RunMode RUN_TO_POSITION;
 
     private double horizontalSlidePosition = gamepad1.right_stick_y;
 
@@ -46,6 +48,11 @@ public class MyBasicOmniTeleOpMode extends LinearOpMode {
 
         verticalClaw = hardwareMap.get(Servo.class, "verticalClaw");
         horizontalClaw = hardwareMap.get(Servo.class, "horizontalClaw");
+
+        //set Motor Mode
+        linearSlideRight.setMode(RUN_TO_POSITION);
+        linearSlideLeft.setMode(RUN_TO_POSITION);
+        
 
         // Set motor directions.
         rightFrontWheel.setDirection(DcMotor.Direction.FORWARD);
