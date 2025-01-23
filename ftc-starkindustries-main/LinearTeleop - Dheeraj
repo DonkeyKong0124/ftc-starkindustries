@@ -1,0 +1,143 @@
+package org.firstinspires.ftc.teamcode;
+
+import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.Servo;
+
+@TeleOp(name = "Tele", group = "Linear OpMode")
+public class MyBasicOmniTeleOpMode extends LinearOpMode {
+
+    // Declare OpMode members for motors and servos.
+    private ElapsedTime runtime = new ElapsedTime();
+    private DcMotor rightFrontWheel = null;
+    private DcMotor rightRearWheel = null;
+    private DcMotor leftFrontWheel = null;
+    private DcMotor leftRearWheel = null;
+
+    private DcMotor leftLinearSlide = null;
+    private DcMotor rightLinearSlide = null;
+    private DcMotor horizontalSlide = null;
+
+    private Servo verticalClaw = null;
+    private Servo horizontalClaw = null;
+
+    private static final int VERTICAL_HOOK_POSITION = 800;
+    private static final int VERTICAL_PERIMETER_POSITION = 300;
+
+    @Override
+    public void runOpMode() {
+
+        // Initialize hardware variables with names matching the robot configuration.
+        rightFrontWheel = hardwareMap.get(DcMotor.class, "frontRight");
+        rightRearWheel = hardwareMap.get(DcMotor.class, "backRight");
+        leftFrontWheel = hardwareMap.get(DcMotor.class, "frontLeft");
+        leftRearWheel = hardwareMap.get(DcMotor.class, "backLeft");
+
+        leftLinearSlide = hardwareMap.get(DcMotor.class, "linearSlideLeft");
+        rightLinearSlide = hardwareMap.get(DcMotor.class, "linearSlideRight");
+        horizontalSlide = hardwareMap.get(DcMotor.class, "horizontalSlide");
+
+        verticalClaw = hardwareMap.get(Servo.class, "verticalClaw");
+        horizontalClaw = hardwareMap.get(Servo.class, "horizontalClaw");
+
+        // Set motor directions.
+        rightFrontWheel.setDirection(DcMotor.Direction.FORWARD);
+        rightRearWheel.setDirection(DcMotor.Direction.FORWARD);
+        leftFrontWheel.setDirection(DcMotor.Direction.REVERSE);
+        leftRearWheel.setDirection(DcMotor.Direction.REVERSE);
+
+        leftLinearSlide.setDirection(DcMotor.Direction.REVERSE); // Ensure slides move together
+        rightLinearSlide.setDirection(DcMotor.Direction.FORWARD);
+
+        // Set Zero Power Behavior for motors
+        leftLinearSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightLinearSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        horizontalSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        // Set run mode for linear slides
+        leftLinearSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightLinearSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftLinearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightLinearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        telemetry.addData("Status", "Initialized");
+        telemetry.update();
+
+        waitForStart();
+        runtime.reset();
+
+        while (opModeIsActive()) {
+
+            // ------------ WHEELS -------------- //
+
+            // AXIAL - Forward and Backward
+            double axialPower = -gamepad1.left_stick_y;
+            // LATERAL - Left and Right
+            double lateralPower = gamepad1.left_stick_x / 2.0;
+            // YAW - Clockwise and Anti-clockwise
+            double yawPower = gamepad1.right_stick_x;
+
+            // Set motor power for drivetrain.
+            rightFrontWheel.setPower(axialPower - lateralPower - yawPower);
+            rightRearWheel.setPower(axialPower + lateralPower - yawPower);
+
+            leftFrontWheel.setPower(axialPower + lateralPower + yawPower);
+            leftRearWheel.setPower(axialPower - lateralPower + yawPower);
+
+            // ------------ LINEAR SLIDES -------------- //
+
+            if (gamepad1.dpad_up) {
+                leftLinearSlide.setTargetPosition(VERTICAL_HOOK_POSITION);
+                rightLinearSlide.setTargetPosition(VERTICAL_HOOK_POSITION);
+                leftLinearSlide.setPower(1.0);
+                rightLinearSlide.setPower(1.0);
+            } else if (gamepad1.dpad_down) {
+                leftLinearSlide.setTargetPosition(VERTICAL_PERIMETER_POSITION);
+                rightLinearSlide.setTargetPosition(VERTICAL_PERIMETER_POSITION);
+                leftLinearSlide.setPower(1.0);
+                rightLinearSlide.setPower(1.0);
+            } else {
+                leftLinearSlide.setPower(0.0);
+                rightLinearSlide.setPower(0.0);
+            }
+
+            // ------------ CLAW -------------- //
+
+            verticalClaw.scaleRange(0.1, 0.8);
+            horizontalClaw.scaleRange(0.1, 0.8);
+
+            if (gamepad1.b) {
+                verticalClaw.setPosition(0.1); // Open claw
+            }
+            if (gamepad1.x) {
+                verticalClaw.setPosition(1.0); // Close claw
+            }
+
+            if (gamepad1.y) {
+                horizontalClaw.setPosition(0.0); // Open claw
+            }
+            if (gamepad1.a) {
+                horizontalClaw.setPosition(1.0); // Close claw
+            }
+
+            // ------------ HORIZONTAL SLIDE -------------- //
+
+            double horizontalPower = -gamepad1.right_stick_y;
+            horizontalSlide.setPower(horizontalPower);
+
+            // ------------ TELEMETRY -------------- //
+
+            telemetry.addData("Status", "Run Time: " + runtime.toString());
+            telemetry.addData("Wheels", "LF (%.2f), RF (%.2f), LB (%.2f), RB (%.2f)",
+                    leftFrontWheel.getPower(), rightFrontWheel.getPower(),
+                    leftRearWheel.getPower(), rightRearWheel.getPower());
+            telemetry.addData("Linear Slides", "Left: %d, Right: %d",
+                    leftLinearSlide.getCurrentPosition(), rightLinearSlide.getCurrentPosition());
+            telemetry.addData("Horizontal Slide Power", "%.2f", horizontalPower);
+            telemetry.update();
+        }
+    }
+}
