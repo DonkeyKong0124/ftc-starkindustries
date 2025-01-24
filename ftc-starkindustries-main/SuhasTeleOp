@@ -16,7 +16,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
 @TeleOp(name = "Tele", group = "Linear OpMode")
-public class DheerajTeleop extends LinearOpMode {
+public class SuhasLinearTeleOp extends LinearOpMode {
 
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor rightFrontWheel = null;
@@ -51,6 +51,9 @@ public class DheerajTeleop extends LinearOpMode {
         verticalClaw = hardwareMap.get(Servo.class, "verticalClaw");
         horizontalClaw = hardwareMap.get(Servo.class, "horizontalClaw");
 
+        // verticalClaw.scaleRange(0.1, 0.8);
+        // horizontalClaw.scaleRange(0.1, 0.8);
+
         // Set motor directions
         rightFrontWheel.setDirection(DcMotor.Direction.FORWARD);
         rightRearWheel.setDirection(DcMotor.Direction.FORWARD);
@@ -76,7 +79,7 @@ public class DheerajTeleop extends LinearOpMode {
         while (opModeIsActive()) {
 
             // ------------ WHEELS -------------- //
-            double axialPower = -gamepad1.left_stick_y;
+            double axialPower = gamepad1.left_stick_y;
             double lateralPower = gamepad1.left_stick_x / 2;
             double yawPower = gamepad1.right_stick_x;
 
@@ -88,27 +91,23 @@ public class DheerajTeleop extends LinearOpMode {
             // ------------ LINEAR SLIDES -------------- //
             // double verticalPower = gamepad1.right_trigger;
             // // Set target position for slides when dpad is pressed
-            if (gamepad1.dpad_up) {
-                // currentSlideTarget = VERTICAL_HOOK_POSITION;
-                leftLinearSlide.setTargetPosition(-500);
-                rightLinearSlide.setTargetPosition(-500);
-                // leftLinearSlide.setPower(verticalPower);
-                // rightLinearSlide.setPower(verticalPower);
-            // } else if (gamepad1.dpad_down) {
-            //     currentSlideTarget = VERTICAL_PERIMETER_POSITION;
-            //     leftLinearSlide.setTargetPosition(currentSlideTarget);
-            //     rightLinearSlide.setTargetPosition(currentSlideTarget);
-            }
+            // if (gamepad1.dpad_up) {
+            //     // currentSlideTarget = VERTICAL_HOOK_POSITION;
+            //     leftLinearSlide.setTargetPosition(-500);
+            //     rightLinearSlide.setTargetPosition(-500);
+            //     // leftLinearSlide.setPower(verticalPower);
+            //     // rightLinearSlide.setPower(verticalPower);
+            //  } else if (gamepad1.dpad_down) {
+            // //     currentSlideTarget = VERTICAL_PERIMETER_POSITION;
+            //      leftLinearSlide.setTargetPosition(500);
+            //      rightLinearSlide.setTargetPosition(500);
+            // }
             
             double verticalUpPower = gamepad1.right_stick_y;
-            leftLinearSlide.setPower(-verticalUpPower);
-            rightLinearSlide.setPower(-verticalUpPower);
-            
-            
-            double verticalDownPower = gamepad1.left_trigger;
-            leftLinearSlide.setPower(10*verticalDownPower);
-            rightLinearSlide.setPower(10*verticalDownPower);
+            leftLinearSlide.setPower(verticalUpPower);
+            rightLinearSlide.setPower(verticalUpPower);
 
+            
             // Continuously move linear slides toward target position
             
 
@@ -119,32 +118,46 @@ public class DheerajTeleop extends LinearOpMode {
             // rightLinearSlide.setPower(1.0);
 
             // ------------ CLAW -------------- //
+            
             verticalClaw.scaleRange(0.1, 0.8);
             horizontalClaw.scaleRange(0.1, 0.8);
-
+            
             if (gamepad1.b) {
-                verticalClaw.setPosition(0.1); // Open claw
+                verticalClaw.setPosition(0.1); // Adjusted position for open claw
             }
             if (gamepad1.x) {
-                verticalClaw.setPosition(1.0); // Close claw
+                verticalClaw.setPosition(1.0); // Adjusted position for close claw
             }
 
             if (gamepad1.y) {
-                horizontalClaw.setPosition(0.0); // Open claw
+                horizontalClaw.setPosition(0.1); // Adjusted position for open claw
             }
             if (gamepad1.a) {
-                horizontalClaw.setPosition(1.0); // Close claw
+                horizontalClaw.setPosition(1.0); // Adjusted position for close claw
             }
 
             // ------------ HORIZONTAL SLIDE -------------- //
-            double horizontalPower = gamepad1.right_stick_y;
-            horizontalSlide.setPower(horizontalPower);
+                            double horizontalForwardPower = gamepad1.left_trigger;
+
+                        if (gamepad1.left_trigger > 0) {
+
+            horizontalSlide.setDirection(DcMotor.Direction.FORWARD);
+            horizontalSlide.setPower(horizontalForwardPower);
+                        }
+                                    double horizontalBackPower = gamepad1.right_trigger;
+
+                        if (gamepad1.right_trigger > 0) {
+
+                        horizontalSlide.setDirection(DcMotor.Direction.REVERSE);
+
+            horizontalSlide.setPower(horizontalBackPower);}
 
             // ---------------- TELEMETRY ------------------- //
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Left Linear Slide Position", leftLinearSlide.getCurrentPosition());
             telemetry.addData("Right Linear Slide Position", rightLinearSlide.getCurrentPosition());
-            telemetry.addData("Horizontal Slide Power", horizontalPower);
+            telemetry.addData("Horizontal Forward Slide Power", horizontalForwardPower);
+            telemetry.addData("Horizontal Back Slide Power", horizontalBackPower);
             telemetry.addData("Vertical Claw Position", verticalClaw.getPosition());
             telemetry.addData("Horizontal Claw Position", horizontalClaw.getPosition());
             telemetry.addData("Vertical Slides Position", ((DcMotorEx) leftLinearSlide).getCurrent(CurrentUnit.AMPS));
