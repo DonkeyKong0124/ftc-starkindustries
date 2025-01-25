@@ -61,7 +61,7 @@ public class TeamCode extends LinearOpMode {
         while (opModeIsActive()) {
             // ------------ WHEELS: Strafing and Yawing ------------ //
             double axialPower = -gamepad1.left_stick_y;  // Forward/Backward
-            double lateralPower = gamepad1.left_stick_x; // Strafing (sideways)
+            double lateralPower = gamepad1.left_stick_x/2; // Strafing (sideways)
             double yawPower = gamepad1.right_stick_x;    // Turning (rotation)
 
             // Mecanum wheel power calculations
@@ -70,11 +70,13 @@ public class TeamCode extends LinearOpMode {
             double rearLeftPower = axialPower - lateralPower + yawPower;
             double rearRightPower = axialPower + lateralPower - yawPower;
 
-            // Set power to the motors
-            leftFrontWheel.setPower(frontLeftPower);
-            rightFrontWheel.setPower(frontRightPower);
-            leftRearWheel.setPower(rearLeftPower);
-            rightRearWheel.setPower(rearRightPower);
+            // Set motor power for drivetrain.
+            rightFrontWheel.setPower(axialPower - lateralPower - yawPower);
+            rightRearWheel.setPower(-axialPower + lateralPower - yawPower);
+
+            leftFrontWheel.setPower(axialPower + lateralPower + yawPower);
+            leftRearWheel.setPower(-axialPower - lateralPower + yawPower);
+
 
             // ------------ LINEAR SLIDES ------------ //
             double verticalUpPower = -gamepad1.right_stick_y; // Up/Down on right stick
