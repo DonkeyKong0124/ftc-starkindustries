@@ -83,7 +83,7 @@ public class TeamCode extends LinearOpMode {
 
             // ------------ HORIZONTAL SLIDE ------------ //
             if (gamepad1.left_trigger > 0) {
-                horizontalSlide.setPower(gamepad1.left_trigger); // Forward
+                horizontalSlide.setPower(0.9*gamepad1.left_trigger); // Forward
             } else if (gamepad1.right_trigger > 0) {
                 horizontalSlide.setPower(-gamepad1.right_trigger); // Backward
             } else {
