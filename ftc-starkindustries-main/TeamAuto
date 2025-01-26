@@ -1,0 +1,132 @@
+package org.firstinspires.ftc.teamcode;
+
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+
+@TeleOp(name = "TeamTeleop", group = "Linear OpMode")
+public class TeamTeleop extends LinearOpMode {
+
+    private static final int VERTICAL_HOOK_POSITION = 1;
+    private static final int VERTICAL_PERIMETER_POSITION = 0;
+    private final ElapsedTime runtime = new ElapsedTime();
+    private DcMotor rightFrontWheel = null;
+    private DcMotor rightRearWheel = null;
+    private DcMotor leftFrontWheel = null;
+    private DcMotor leftRearWheel = null;
+    private DcMotor leftLinearSlide = null;
+    private DcMotor rightLinearSlide = null;
+    private DcMotor horizontalSlide = null;
+    private Servo verticalClaw = null;
+    private Servo horizontalClaw = null;
+    private final int currentSlideTarget = 0;
+
+    @Override
+    public void runOpMode() {
+
+        // Initialize hardware variables.
+        rightFrontWheel = hardwareMap.get(DcMotor.class, "frontRight");
+        rightRearWheel = hardwareMap.get(DcMotor.class, "backRight");
+        leftFrontWheel = hardwareMap.get(DcMotor.class, "frontLeft");
+        leftRearWheel = hardwareMap.get(DcMotor.class, "backLeft");
+
+        leftLinearSlide = hardwareMap.get(DcMotor.class, "linearSlideLeft");
+        rightLinearSlide = hardwareMap.get(DcMotor.class, "linearSlideRight");
+        horizontalSlide = hardwareMap.get(DcMotor.class, "horizontalSlide");
+
+        verticalClaw = hardwareMap.get(Servo.class, "verticalClaw");
+        horizontalClaw = hardwareMap.get(Servo.class, "horizontalClaw");
+
+        // Set motor directions
+        rightFrontWheel.setDirection(DcMotor.Direction.FORWARD);
+        rightRearWheel.setDirection(DcMotor.Direction.FORWARD);
+        leftFrontWheel.setDirection(DcMotor.Direction.REVERSE);
+        leftRearWheel.setDirection(DcMotor.Direction.REVERSE);
+
+        leftLinearSlide.setDirection(DcMotor.Direction.REVERSE);
+        rightLinearSlide.setDirection(DcMotor.Direction.FORWARD);
+
+        // Set Zero Power Behavior to BRAKE
+        leftLinearSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightLinearSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        horizontalSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        verticalClaw.scaleRange(0.1, 0.8);
+        horizontalClaw.scaleRange(0.1, 0.8);
+
+        // Initialize telemetry
+        telemetry.addData("Status", "Initialized");
+        telemetry.update();
+
+        waitForStart();
+        runtime.reset();
+
+        // Main loop
+        while (opModeIsActive()) {
+
+            // ------------ WHEELS BEGIN -------------- //
+
+            double axialPower = -gamepad1.left_stick_y;
+            double lateralPower = gamepad1.left_stick_x/2;
+            double yawPower = gamepad1.right_stick_x/2;
+            
+            rightFrontWheel.setPower(axialPower - lateralPower - yawPower);
+            rightRearWheel.setPower(axialPower + lateralPower - yawPower);
+
+            leftFrontWheel.setPower(axialPower + lateralPower + yawPower);
+            leftRearWheel.setPower(axialPower - lateralPower + yawPower);
+
+            // ------------ WHEELS END -------------- //
+
+
+            // ------------ CLAW BEGIN -------------- //
+
+            if (gamepad2.b) {
+                verticalClaw.setPosition(0.1); // Adjusted position for open claw
+            }
+            if (gamepad2.x) {
+                verticalClaw.setPosition(1.0); // Adjusted position for close claw
+            }
+
+            if (gamepad2.y) {
+                horizontalClaw.setPosition(0.1); // Adjusted position for open claw
+            }
+            if (gamepad2.a) {
+                horizontalClaw.setPosition(1.0); // Adjusted position for close claw
+            }
+
+            // ------------ CLAW END -------------- //
+
+
+            // ------------ HORIZONTAL SLIDE BEGIN -------------- //
+
+            double horizontalPower = gamepad2.right_stick_y;
+            horizontalSlide.setPower(horizontalPower);
+
+            // ------------ HORIZONTAL SLIDE END -------------- //
+
+
+            // ------------ VERTICAL SLIDE BEGIN -------------- //
+
+            double verticalPower = gamepad2.left_stick_y;
+            rightLinearSlide.setPower(verticalPower);
+            leftLinearSlide.setPower(verticalPower);
+
+            // ------------ VERTICAL SLIDE END -------------- //
+
+
+            // ---------------- TELEMETRY ------------------- //
+            telemetry.addData("Status", "Run Time: " + runtime.toString());
+            telemetry.addData("Vertical Slide Power", verticalPower);
+            telemetry.addData("Horizontal Slide Power", horizontalPower);
+            telemetry.addData("Vertical Claw Position", verticalClaw.getPosition());
+            telemetry.addData("Horizontal Claw Position", horizontalClaw.getPosition());
+            telemetry.update();
+        }
+    }
+}
