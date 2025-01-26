@@ -1,22 +1,31 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.util.ElapsedTime;
-import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
-@TeleOp(name = "Tele", group = "Linear OpMode")
-public class TeamCode extends LinearOpMode {
 
-    private ElapsedTime runtime = new ElapsedTime();
-    private DcMotor rightFrontWheel = null;
-    private DcMotor rightRearWheel = null;
-    private DcMotor leftFrontWheel = null;
-    private DcMotor leftRearWheel = null;
+// Register this as an autonomous OpMode for the robot controller app
+@Autonomous(name = "TeamAuto", group = "Robot")
+public class TeamAuto extends LinearOpMode {
+
+    static final double COUNTS_PER_MOTOR_REV = 1024;   
+    static final double DRIVE_GEAR_REDUCTION = 1.0;     // No External Gearing.
+    static final double WHEEL_DIAMETER_INCHES = 2.95;     // For figuring circumference
+    static final double COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCHES * 3.1415);
+    static final double DRIVE_SPEED = 1;
+    static final double TURN_SPEED = 0.8;
+    static final double ARM_SPEED = 1.0;
+ 
+    // Declare OpMode members for motors and servos.
+    private final ElapsedTime runtime = new ElapsedTime();
+    private DcMotor rightFrontWheel = null; // Forward
+    private DcMotor rightRearWheel = null; // Forward
+    private DcMotor leftFrontWheel = null; // Backward
+    private DcMotor leftRearWheel = null; // Backward
 
     private DcMotor leftLinearSlide = null;
     private DcMotor rightLinearSlide = null;
@@ -25,14 +34,15 @@ public class TeamCode extends LinearOpMode {
     private Servo verticalClaw = null;
     private Servo horizontalClaw = null;
 
+
     @Override
     public void runOpMode() {
 
-        // Initialize hardware variables.
-        rightFrontWheel = hardwareMap.get(DcMotor.class, "frontRight");
-        rightRearWheel = hardwareMap.get(DcMotor.class, "backRight");
-        leftFrontWheel = hardwareMap.get(DcMotor.class, "frontLeft");
-        leftRearWheel = hardwareMap.get(DcMotor.class, "backLeft");
+        // Initialize hardware variables with names matching the robot configuration.
+        rightFrontWheel = hardwareMap.get(DcMotor.class, "frontRight"); // Forward
+        rightRearWheel = hardwareMap.get(DcMotor.class, "backRight"); // Forward
+        leftFrontWheel = hardwareMap.get(DcMotor.class, "frontLeft"); // Backward
+        leftRearWheel = hardwareMap.get(DcMotor.class, "backLeft"); // Backward
 
         leftLinearSlide = hardwareMap.get(DcMotor.class, "linearSlideLeft");
         rightLinearSlide = hardwareMap.get(DcMotor.class, "linearSlideRight");
@@ -41,73 +51,324 @@ public class TeamCode extends LinearOpMode {
         verticalClaw = hardwareMap.get(Servo.class, "verticalClaw");
         horizontalClaw = hardwareMap.get(Servo.class, "horizontalClaw");
 
-        // Set motor directions
+        // Set motor directions.
         rightFrontWheel.setDirection(DcMotor.Direction.FORWARD);
         rightRearWheel.setDirection(DcMotor.Direction.FORWARD);
         leftFrontWheel.setDirection(DcMotor.Direction.REVERSE);
         leftRearWheel.setDirection(DcMotor.Direction.REVERSE);
 
-        leftLinearSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightLinearSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        horizontalSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightFrontWheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightRearWheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftFrontWheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftRearWheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftLinearSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightLinearSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        horizontalSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        // Initialize telemetry
+        rightFrontWheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightRearWheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftFrontWheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftRearWheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftLinearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightLinearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        horizontalSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        // Display status and update telemetry.
         telemetry.addData("Status", "Initialized");
+        telemetry.addData("Status", "Run Time: " + runtime.toString());
+        telemetry.addData("Starting at", "%7d :%7d :%7d :%7d",
+        leftFrontWheel.getCurrentPosition(),
+        leftRearWheel.getCurrentPosition(),
+        rightFrontWheel.getCurrentPosition(),
+        rightRearWheel.getCurrentPosition());
+
         telemetry.update();
 
         waitForStart();
-        runtime.reset();
 
-        while (opModeIsActive()) {
-            // ------------ WHEELS: Strafing and Yawing ------------ //
-            double axialPower = -gamepad1.left_stick_y;  // Forward/Backward
-            double lateralPower = gamepad1.left_stick_x/2; // Strafing (sideways)
-            double yawPower = gamepad1.right_stick_x;    // Turning (rotation)
+        // Step through each leg of the path,
+        // Note: Reverse movement is obtained by setting a negative distance (not speed)
 
-            // Mecanum wheel power calculations
-            double frontLeftPower = axialPower + lateralPower + yawPower;
-            double frontRightPower = axialPower - lateralPower - yawPower;
-            double rearLeftPower = axialPower - lateralPower + yawPower;
-            double rearRightPower = axialPower + lateralPower - yawPower;
+        // (RIGHT SIDE)
+        encoderDrive(DRIVE_SPEED, 10, 10, 2);           // Move forward
+        encoderVerticalSlide(ARM_SPEED, -0.2, 2);       // Vertical Up
+        encoderDrive(DRIVE_SPEED, 3.3, 3.3, 2);         // Move forward
+        encoderVerticalSlide(ARM_SPEED, 0.5, 1);      // Vertical Down
+        encoderDrive(DRIVE_SPEED, -2, -2, 1);           // Move backward
+        encoderDrive(TURN_SPEED, 20, -20, 1.5);     // Turn right
+        verticalClaw.setPosition(0.1);                  // Open Claw
+        encoderDrive(DRIVE_SPEED, 15, 15, 2);           // Move forward
+        encoderDrive(TURN_SPEED, 20, -20, 1.5);     // Turn right
 
-            // Set motor power for drivetrain.
-            rightFrontWheel.setPower(axialPower - lateralPower - yawPower);
-            rightRearWheel.setPower(-axialPower + lateralPower - yawPower);
-
-            leftFrontWheel.setPower(axialPower + lateralPower + yawPower);
-            leftRearWheel.setPower(-axialPower - lateralPower + yawPower);
+        // encoderDrive(TURN_SPEED, 10.5, -10.5, 1.0);     // Turn right
+        // encoderDrive(DRIVE_SPEED, 5, 5, 2);             // Move forward
+        // verticalClaw.setPosition(1.0);                  // Close Claw
 
 
-            // ------------ LINEAR SLIDES ------------ //
-            double verticalUpPower = -gamepad1.right_stick_y; // Up/Down on right stick
-            leftLinearSlide.setPower(verticalUpPower);
-            rightLinearSlide.setPower(verticalUpPower);
 
-            // ------------ HORIZONTAL SLIDE ------------ //
-            if (gamepad1.left_trigger > 0) {
-                horizontalSlide.setPower(0.9*gamepad1.left_trigger); // Forward
-            } else if (gamepad1.right_trigger > 0) {
-                horizontalSlide.setPower(-gamepad1.right_trigger); // Backward
-            } else {
-                horizontalSlide.setPower(0); // Stop
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+        // verticalClaw.setPosition(0.1);                 //Open Claw
+        // encoderDrive(DRIVE_SPEED, -9.3, -9.3, 1.0);  // Move backward
+        // encoderDrive(TURN_SPEED, 10.5, -10.5, 1.0);  // Turn right
+        // encoderDrive(DRIVE_SPEED, 17.3, 17.3, 1.0);  // Move forward
+        // encoderDrive(TURN_SPEED, 10.5, -10.5, 1.0);  // Turn right
+        // encoderDrive(DRIVE_SPEED, 8.3, 8.3, 1.0);  // Move forward
+        // verticalClaw.setPosition(1.0);                 //Close Claw
+        // encoderVerticalSlide(ARM_SPEED, 2, 2); // Vertical up
+        // encoderDrive(DRIVE_SPEED, -8.3, -8.3, 1.0);  // Move backward
+        // encoderDrive(TURN_SPEED, 10.5, -10.5, 1.0);  // Turn right
+        // encoderDrive(DRIVE_SPEED, 17.3, 17.3, 1.0);  // Move forward
+        // encoderDrive(TURN_SPEED, 10.5, -10.5, 1.0);  // Turn right
+        // encoderVerticalSlide(ARM_SPEED, 5, 2); // Vertical up
+        // encoderDrive(DRIVE_SPEED, 9.3, 9.3, 1.0);  // Move forward
+        // encoderVerticalSlide(ARM_SPEED, -5, 2); // Vertical down
+
+
+        //encoderHorizontalSlide(ARM_SPEED, 5, 3); // Horizontal forward
+        // sleep(1000);
+        // encoderVerticalSlide(ARM_SPEED, 5, 2); // Vertical up
+
+        // verticalClaw.setPosition(0.1);                 //Open Claw
+        // horizontalClaw.setPosition(0.1);                 //Open Claw
+
+        // LEFT SIDE HOOK
+        // encoderDrive(DRIVE_SPEED, 6.7, 6.7, 1.0);  // Move forward
+        // encoderTowerArm(ARM_SPEED, 30, 3.5); // Towerarm lift
+        // encoderForeArms(ARM_SPEED, 45.8, 2); // Extend ForeArm forward
+        // claw.setPosition(0.0);     
+
+        // SECOND HOOK (IN PROGRESS)
+        // encoderForeArms(ARM_SPEED, -8, 1.0); // retract ForeArm backward
+        // encoderTowerArm(ARM_SPEED, -20, 1.0); // Towerarm down
+        // encoderDrive(TURN_SPEED, 10.5, -10.5, 1.0);  // Turn right
+        // encoderDrive(DRIVE_SPEED, 22,  22, 3.0);  // Move forward
+        // encoderDrive(TURN_SPEED, -10.5, 10.5, 1.0);  // Turn left        
+        // encoderDrive(DRIVE_SPEED, 4.9,  4.9, 2.4);  // Move forward
+        // claw.setPosition(1.0);  //Close Claw
+        // sleep(1000);
+        // encoderDrive(TURN_SPEED, -24, 24, 4.0);  // Turn left
+        // encoderDrive(DRIVE_SPEED, 10, 14, 4.0);  // Move forward
+        // sleep(1000);
+        // claw.setPosition(0.0);                 //Open Claw
+
+        // encoderDrive(TURN_SPEED, 10.5, -10.5, 2.3);  // Turn right
+        // encoderDrive(DRIVE_SPEED, 5,  5, 1.0);  // Move forward
+        // encoderDrive(TURN_SPEED, 10.5, -10.5, 2.3);  // Turn right
+        //  encoderDrive(DRIVE_SPEED, 10,  10, 1.0);  // Move forward
+        //   encoderTowerArm(ARM_SPEED, 10, 3.5); // Towerarm lift
+        // encoderForeArms(ARM_SPEED, 10, 3.5); // Extend ForeArm forward
+        // claw.setPosition(1.0);                 //Close Claw
+
+        // encoderDrive(DRIVE_SPEED, 3, 3, 2.0);  // Move forward
+        // encoderDrive(TURN_SPEED, -10.5, 10.5, 2.0);  // Turn left
+        // encoderDrive(DRIVE_SPEED, 10,  10, 1.0);  // Move forward
+        // encoderDrive(TURN_SPEED, 10.5, -10.5, 2.3);  // Turn right
+        // encoderDrive(DRIVE_SPEED, 4,  4, 1.0);  // Move forward
+        // encoderTowerArm(ARM_SPEED, 20, 3.5); // Towerarm lift
+        // encoderForeArms(ARM_SPEED, 40, 3.5); // Extend ForeArm forward
+        //   encoderDrive(DRIVE_SPEED, 3,  3, 1.0);  // Move forward
+        // claw.setPosition(0.0);                 //Open Claw
+        // encoderForeArms(ARM_SPEED, -40, 3.5); // retract ForeArm backward
+        // encoderTowerArm(ARM_SPEED, -23, 3.5); // Towerarm down
+        //   encoderDrive(DRIVE_SPEED, -2, -2, 1.0);  // Move back
+
+
+        //STRAFING --->
+        // encoderYaw(DRIVE_SPEED, -7, 7, 5.0); // Strafe left
+        //encoderDrive(DRIVE_SPEED, 5, 5, 5.0);  // Move forward
+        //  encoderYaw(DRIVE_SPEED, -7, 7, 3.0);  // Strafe left
+        //   claw.setPosition(0.0);                 //Open Claw
+        //  encoderForeArms(ARM_SPEED, 1, 2.0); // Extend ForeArm forward
+        //  encoderDrive(DRIVE_SPEED, 8,  8, 1.0);  // Move forward
+
+
+        //WITHOUT STRAFING
+        //  encoderDrive(DRIVE_SPEED, 1,  1, 1.0);  // Move forward
+        //  encoderDrive(TURN_SPEED, -10.5, 10.5, 2.0);  // Turn left
+        //  encoderDrive(DRIVE_SPEED, 7.5,  7.5, 1.0);  // Move forward
+        //  encoderDrive(TURN_SPEED, 10.5, -10.5, 2.3);  // Turn right
+        //  encoderForeArms(ARM_SPEED, 1, 2.0); // Extend ForeArm forward
+        //  encoderDrive(DRIVE_SPEED, 4,  4, 2.0);  // Move forward
+        //  claw.setPosition(1.0);                 //Close Claw
+        //  encoderForeArms(ARM_SPEED, -5, 3.5); // retract ForeArm back
+        //  encoderTowerArm(ARM_SPEED, 35, 3.5); // Towerarm lift
+        //  encoderDrive(DRIVE_SPEED, -5,  -5, 1.0);  // Move backward
+        //  encoderDrive(TURN_SPEED,  -13.5, 13.5, 2.0);  // Turn left
+        //  encoderDrive(DRIVE_SPEED, 2,  2, 1.0);  // Move forward
+        //  encoderForeArms(ARM_SPEED, 35, 3.5); // Extend ForeArm forward
+        //  claw.setPosition(0.0);                 //Open Claw
+        //  encoderForeArms(ARM_SPEED, -35, 3.5); // retract ForeArm back
+        //  encoderTowerArm(ARM_SPEED, -35, 3.5); // Towerarm down
+        //  encoderDrive(TURN_SPEED, 13.3, -13.3, 2.0);  // Turn right
+        //  encoderForeArms(ARM_SPEED, 1, 1.0); // Extend ForeArm forward
+        //  encoderDrive(DRIVE_SPEED, 5,  5, 1.0);  // Move forward
+        //  claw.setPosition(1.0);                 //Close Claw
+        //  encoderForeArms(ARM_SPEED, -5, 3.5); // retract ForeArm back
+        //  encoderTowerArm(ARM_SPEED, 35, 3.5); // Towerarm lift
+        //  encoderDrive(DRIVE_SPEED, -5,  -5, 1.0);  // Move backward
+        //  encoderDrive(TURN_SPEED, -13.3, 13.3, 2.0);  // Turn left
+        //  encoderForeArms(ARM_SPEED, 35, 3.5); // Extend ForeArm forward
+        //  claw.setPosition(0.0);                 //Open Claw
+        //  encoderForeArms(ARM_SPEED, -35, 3.5); // retract ForeArm back
+        //  encoderTowerArm(ARM_SPEED, -35, 3.5); // Towerarm down
+        //  encoderDrive(TURN_SPEED, 11.4, -11.4, 2.0);  // Turn right
+        //  encoderForeArms(ARM_SPEED, 1, 1.0); // Extend ForeArm forward
+        //  encoderDrive(DRIVE_SPEED, 6,  6, 1.0);  // Move forward
+        //  claw.setPosition(1.0);                 //Close Claw
+        //  encoderForeArms(ARM_SPEED, -5, 2.0); // retract ForeArm back
+        //  encoderTowerArm(ARM_SPEED, 35, 3.5); // Towerarm lift
+        //  encoderDrive(DRIVE_SPEED, -4,  -4, 1.0);  // Move backward
+        //  encoderDrive(TURN_SPEED, -11.4, 11.4, 2.0);  // Turn left
+        //  encoderForeArms(ARM_SPEED, 35, 3.5); // Extend ForeArm forward
+        //  claw.setPosition(0.0);                 //Open Claw
+        //  encoderForeArms(ARM_SPEED, -35, 3.5); // retract ForeArm back
+        //  encoderTowerArm(ARM_SPEED, -35, 3.5); // Towerarm down
+
+
+        telemetry.addData("Path", "Complete");
+        telemetry.update();
+        sleep(60000);  //1 min  pause to display final telemetry message.
+
+    }
+
+    public void encoderHorizontalSlide(double speed,
+                                       double inches,
+                                       double timeouts) {
+        int newTarget;
+
+        // Ensure that the OpMode is still active
+        if (opModeIsActive()) {
+
+            // Determine new target position, and pass to motor controller
+            newTarget = horizontalSlide.getCurrentPosition() + (int) (inches * COUNTS_PER_INCH);
+
+            horizontalSlide.setTargetPosition(newTarget);
+
+            // Turn On RUN_TO_POSITION
+            horizontalSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            // reset the timeout time and start motion.
+            runtime.reset();
+            horizontalSlide.setPower(Math.abs(speed));
+
+            while (opModeIsActive() && (runtime.seconds() < timeouts) && (horizontalSlide.isBusy())) {
+                // Display it for the driver.
+                telemetry.addData("Running to", " %7d", newTarget);
+                telemetry.addData("Currently at", " at %7d", horizontalSlide.getCurrentPosition());
+                telemetry.update();
             }
 
-            // ------------ CLAW CONTROL ------------ //
-            verticalClaw.scaleRange(0.1, 0.8);
-            horizontalClaw.scaleRange(0.1, 0.8);
+            // Stop all motion;
+            horizontalSlide.setPower(0);
 
-            if (gamepad1.b) verticalClaw.setPosition(0.1); // Open vertical claw
-            if (gamepad1.x) verticalClaw.setPosition(1.0); // Close vertical claw
-            if (gamepad1.y) horizontalClaw.setPosition(0.1); // Open horizontal claw
-            if (gamepad1.a) horizontalClaw.setPosition(1.0); // Close horizontal claw
+            // Turn off RUN_TO_POSITION
+            horizontalSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-            // ------------ TELEMETRY ------------ //
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("Left Linear Slide Position", leftLinearSlide.getCurrentPosition());
-            telemetry.addData("Right Linear Slide Position", rightLinearSlide.getCurrentPosition());
-            telemetry.addData("Vertical Claw Position", verticalClaw.getPosition());
-            telemetry.addData("Horizontal Claw Position", horizontalClaw.getPosition());
-            telemetry.update();
         }
     }
+
+    public void encoderVerticalSlide(double speed,
+                                     double inches,
+                                     double timeouts) {
+        int newTarget;
+
+        // Ensure that the OpMode is still active
+        if (opModeIsActive()) {
+
+            // Determine new target position, and pass to motor controller
+            newTarget = rightLinearSlide.getCurrentPosition() + (int) (inches * COUNTS_PER_INCH);
+
+            rightLinearSlide.setTargetPosition(newTarget);
+
+            // Turn On RUN_TO_POSITION
+            rightLinearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            // reset the timeout time and start motion.
+            runtime.reset();
+            rightLinearSlide.setPower(Math.abs(speed));
+
+            while (opModeIsActive() && (runtime.seconds() < timeouts) && (rightLinearSlide.isBusy())) {
+                // Display it for the driver.
+                telemetry.addData("Running to", " %7d", newTarget);
+                telemetry.addData("Currently at", " at %7d", rightLinearSlide.getCurrentPosition());
+                telemetry.update();
+            }
+
+            // Stop all motion;
+            rightLinearSlide.setPower(0);
+
+            // Turn off RUN_TO_POSITION
+            rightLinearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        }
+    }
+
+    public void encoderDrive(double speed,
+                             double leftInches, double rightInches,
+                             double timeouts) {
+        int newLeftTarget;
+        int newRightTarget;
+
+        // Ensure that the OpMode is still active
+        if (opModeIsActive()) {
+
+            // Determine new target position, and pass to motor controller
+            newLeftTarget = leftFrontWheel.getCurrentPosition() + (int) (leftInches * COUNTS_PER_INCH);
+            newRightTarget = rightFrontWheel.getCurrentPosition() + (int) (rightInches * COUNTS_PER_INCH);
+
+            leftFrontWheel.setTargetPosition(newLeftTarget);
+            leftRearWheel.setTargetPosition(newLeftTarget);
+            rightFrontWheel.setTargetPosition(newRightTarget);
+            rightRearWheel.setTargetPosition(newRightTarget);
+
+            // Turn On RUN_TO_POSITION
+            leftFrontWheel.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            leftRearWheel.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            rightFrontWheel.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            rightRearWheel.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            // reset the timeout time and start motion.
+            runtime.reset();
+            leftFrontWheel.setPower(Math.abs(speed));
+            leftRearWheel.setPower(Math.abs(speed));
+            rightFrontWheel.setPower(Math.abs(speed));
+            rightRearWheel.setPower(Math.abs(speed));
+
+            while (opModeIsActive() && (runtime.seconds() < timeouts) && (leftFrontWheel.isBusy() || rightFrontWheel.isBusy())) {
+                // Display it for the driver.
+                telemetry.addData("Running to", " %7d :%7d", newLeftTarget, newRightTarget);
+                telemetry.addData("Currently at", " at %7d :%7d",
+                        leftFrontWheel.getCurrentPosition(), rightFrontWheel.getCurrentPosition());
+                telemetry.update();
+            }
+
+            // Stop all motion;
+            leftFrontWheel.setPower(0);
+            leftRearWheel.setPower(0);
+            rightFrontWheel.setPower(0);
+            rightRearWheel.setPower(0);
+
+            // Turn off RUN_TO_POSITION
+            leftFrontWheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            leftRearWheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            rightFrontWheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            rightRearWheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        }
+    }
+
+
 }
